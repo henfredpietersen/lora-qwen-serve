@@ -18,7 +18,12 @@ def compare(path: Path) -> dict:
         "n": len(rows),
         "base_accuracy": round(accuracy(rows, "base"), 3),
         "lora_accuracy": round(accuracy(rows, "lora"), 3),
-        "note": "Fill base/lora from a real generate() pass. Do not commit invented scores as measured.",
+        "source": str(path.name),
+        "note": (
+            "FIXTURE: hand-written format example, not a result."
+            if "example" in path.name
+            else "From a predict.py run. n is tiny; treat as a smoke test."
+        ),
     }
 
 

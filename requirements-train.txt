@@ -1,6 +1,5 @@
-torch
+# Colab GPU only. Colab already ships torch with CUDA; this installs the rest.
 transformers>=4.44
 peft>=0.12
-accelerate
-bitsandbytes
-datasets
+accelerate>=0.33
+bitsandbytes>=0.43
