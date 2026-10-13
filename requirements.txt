@@ -1,0 +1,10 @@
+# CPU path, used by tests
+pytest>=8.0
+
+# Train extra, Colab GPU only. Not installed by default.
+# torch
+# transformers
+# peft
+# datasets
+# accelerate
+# bitsandbytes

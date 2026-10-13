@@ -1,0 +1,2 @@
+{"messages": [{"role": "system", "content": "Classify the ticket as return, billing, or support. Reply with the label only."}, {"role": "user", "content": "status page shows an outage"}, {"role": "assistant", "content": "support"}], "label": "support"}
+{"messages": [{"role": "system", "content": "Classify the ticket as return, billing, or support. Reply with the label only."}, {"role": "user", "content": "where is the cape town drop-off"}, {"role": "assistant", "content": "return"}], "label": "return"}
