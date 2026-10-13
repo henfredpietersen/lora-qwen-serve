@@ -33,7 +33,7 @@ PYTHONPATH=. python src/compare.py          # scores the FIXTURE file, see below
 PYTHONPATH=. python src/serve.py
 ```
 
-GPU half: open `notebooks/colab_qlora_t4.ipynb` in Colab, set the runtime to T4, set `REPO_URL`, and run all cells. It saves the adapter to `outputs/lora`, writes `data/preds.jsonl`, prints the comparison, and downloads a zip.
+GPU half: open `notebooks/colab_qlora_t4.ipynb` in Colab, set the runtime to T4, and run all cells. It saves the adapter to `outputs/lora`, writes `data/preds.jsonl`, prints the comparison, and downloads a zip.
 
 ## Measured
 
