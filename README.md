@@ -1,6 +1,48 @@
-# lora-qwen-serve
+# Support Ticket Sorter: AI Training Kit
 
-## Problem
+A kit for testing whether a small AI model can be taught to sort customer support messages into three piles (**return**, **billing** or **support**) more cheaply than asking a big AI every time.
+
+> *Previously named `lora-qwen-serve`.*
+
+> **Important: nothing has been trained yet.** The scripts are written, but the training has not been run. There are no results and no accuracy numbers. Every result below says "not measured" until that changes.
+
+## In plain English
+
+**The problem.** A business gets support messages like "I want to send this back" or "why was I charged twice?". Each one needs to be sorted into the right pile. Asking a large, expensive AI to read every message works, but the cost adds up.
+
+**The idea.** A small AI model can sometimes be taught one narrow job, such as this sorting, well enough to replace the big one. That teaching step is called *fine-tuning*. This repository contains everything needed to try it and measure whether it works:
+
+1. **Prepare examples.** 30 hand-written example messages, each with the right label, split into 21 for teaching and 9 held back for testing.
+2. **Teach the small AI** using the 21 examples. This step needs a powerful graphics card, so it is set up to run on a graphics card (a T4) in Google Colab.
+3. **Test it.** Both the original small AI and the taught version sort the 9 held-back messages, and a scoring step compares how many each got right.
+4. **Show how to use it.** A final step prints the command to run the taught AI as a service.
+
+**Who it is for.** Anyone curious how this kind of "teach a small AI one job" experiment is built and measured honestly.
+
+## Where things stand
+
+- **Written and tested:** the example preparation, the scoring step and the other scripts. The automated tests check the logic around training. They never actually train or load an AI model.
+- **Not done:** the training itself. This work was done on a computer without a graphics card, so the Colab notebook was written but never run.
+- **Do not quote any accuracy number from this repository.** The only numbers shown (0% and 100%) come from two hand-written test lines that show the output format. They are not a result.
+- Even when it is run, 9 test messages is very few. A single message equals about 11 percentage points.
+
+## Plain-English glossary
+
+| Term | What it means here |
+|---|---|
+| Fine-tuning (QLoRA, LoRA) | Teaching an existing AI model one extra narrow skill, cheaply, without rebuilding it |
+| Adapter | The small file of "lessons" that gets added on top of the base AI |
+| Base model | The original AI, before being taught anything (here, Qwen2.5-1.5B) |
+| Holdout | Examples kept back, never used for teaching, so the test is fair |
+| Colab / T4 | Google's online notebook service and the graphics card it provides |
+| vLLM | Software for running an AI model as a service other programs can call |
+| 4-bit | A way of shrinking an AI model so it fits on a smaller graphics card |
+
+---
+
+## For developers: technical documentation
+
+### Problem
 
 A small open model can sometimes be adapted to one narrow task (here: labelling support tickets as `return`, `billing`, or `support`) more cheaply than calling a large hosted model for every request. This repo has the pipeline for testing that: data prep, a QLoRA training script for Qwen2.5-1.5B-Instruct, a base-vs-adapter prediction script, a scorer, and a vLLM serve command.
 
@@ -8,7 +50,7 @@ A small open model can sometimes be adapted to one narrow task (here: labelling 
 
 Built AI-assisted under my direction. I specified the pipeline and the honesty rules, reviewed the output, and ran the CPU commands shown here.
 
-## Pipeline
+### Pipeline
 
 | step | file | runs on |
 | --- | --- | --- |
@@ -21,7 +63,7 @@ Built AI-assisted under my direction. I specified the pipeline and the honesty r
 
 `train_lora.py` explains each choice in comments: why 4-bit, why q/v projections, why the prompt is masked from the loss, and why fp16 rather than bf16 on a T4.
 
-## How to run
+### How to run
 
 CPU half (here, or any laptop):
 
@@ -35,7 +77,7 @@ PYTHONPATH=. python src/serve.py
 
 GPU half: open `notebooks/colab_qlora_t4.ipynb` in Colab, set the runtime to T4, and run all cells. It saves the adapter to `outputs/lora`, writes `data/preds.jsonl`, prints the comparison, and downloads a zip.
 
-## Measured
+### Measured
 
 **Fine-tune: not measured.** This session had no GPU, so the notebook was written but **training was not run**. `data/preds.jsonl` does not exist, and a test checks that it hasn't been committed by accident.
 
@@ -55,11 +97,11 @@ Those two numbers are hand-written test inputs. **Do not quote them.**
 
 After a real run: commit `data/preds.jsonl` and `outputs/lora/train_log.json`, paste the output of `python src/compare.py --preds data/preds.jsonl` here unedited, and include n. A 9-row holdout means one ticket is 11 percentage points.
 
-## Tests
+### Tests
 
 `tests/test_prepare.py` (original) and `tests/test_train_pieces.py`: prompt and padding are masked in the labels; free-text output maps to a label; the holdout is stratified 3/3/3; the notebook calls prepare → train → predict → compare in that order and writes `outputs/lora` and `data/preds.jsonl`; no real `preds.jsonl` is committed; `train_lora.py` exits with a clear message when torch is missing. Nothing in the tests trains or loads a model.
 
-## What I would not ship
+### What I would not ship
 
 - Any accuracy claim from 30 hand-written tickets. A real version needs a few hundred labelled real tickets and a held-out set reviewed by someone else.
 - Untuned hyperparameters (r=8, lr 2e-4, 3 epochs, q/v only). They are starting defaults.
